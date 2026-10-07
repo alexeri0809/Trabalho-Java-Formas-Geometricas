@@ -1,0 +1,61 @@
+trabalho-java-formas-geometricas
+└── demo
+    │── pom.xml
+    │── src
+    │   │── main
+    │   │   └── java
+    │   │       └── com
+    │   │           └── example
+    │   │               │── Circulo.java
+    │   │               │── Forma.java
+    │   │               │── ListaFormas.java
+    │   │               │── Main.java
+    │   │               │── No.java
+    │   │               │── Octogono.java
+    │   │               │── Poligono.java
+    │   │               │── Retangulo.java
+    │   │               └── Triangulo.java
+    │   └── test
+    │       └── java
+    │           └── com
+    │               └── example
+    │                   │── FormasTest.java
+    │                   └── ListaFormasTest.java
+    └── target
+        │── classes
+        │   └── com
+        │       └── example
+        │           │── Circulo.class
+        │           │── Forma.class
+        │           │── ListaFormas$NoForma.class
+        │           │── ListaFormas.class
+        │           │── Main.class
+        │           │── No.class
+        │           │── Octogono.class
+        │           │── Poligono.class
+        │           │── Retangulo.class
+        │           └── Triangulo.class
+        │── generated-sources
+        │   └── annotations
+        │── generated-test-sources
+        │   └── test-annotations
+        │── maven-status
+        │   └── maven-compiler-plugin
+        │       │── compile
+        │       │   └── default-compile
+        │       │       │── createdFiles.lst
+        │       │       └── inputFiles.lst
+        │       └── testCompile
+        │           └── default-testCompile
+        │               │── createdFiles.lst
+        │               └── inputFiles.lst
+        │── surefire-reports
+        │   │── com.example.FormasTest.txt
+        │   │── com.example.ListaFormasTest.txt
+        │   │── TEST-com.example.FormasTest.xml
+        │   └── TEST-com.example.ListaFormasTest.xml
+        └── test-classes
+            └── com
+                └── example
+                    │── FormasTest.class
+                    └── ListaFormasTest.class
