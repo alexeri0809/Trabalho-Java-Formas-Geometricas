@@ -1,26 +1,33 @@
 package com.example;
 
+import java.util.function.Supplier;
+
 public class Main {
 
     public static void main(String[] args) {
-        // Formas base
-        Triangulo triangulo = new Triangulo(0, 0, 4, 0, 0, 3);
-        Retangulo retangulo = new Retangulo(0, 0, 5, 2);
-        Circulo circulo = new Circulo(1, 1, 2);
+        // O número de nós decide a forma
+        Forma circulo = FabricaFormas.criar(new No(1, 1), 2);                                   // 1 nó  -> círculo (com raio)
+        Forma reta = FabricaFormas.criar(new No(0, 0), new No(3, 4));                           // 2 nós -> reta
+        Forma triangulo = FabricaFormas.criar(new No(0, 0), new No(4, 0), new No(0, 3));        // 3 nós -> triângulo
+        Forma retangulo = FabricaFormas.criar(
+                new No(0, 0), new No(5, 0), new No(5, 2), new No(0, 2));                        // 4 nós em retângulo -> retângulo
+        Forma quadrilatero = FabricaFormas.criar(
+                new No(0, 0), new No(4, 0), new No(3, 2), new No(1, 2));                        // 4 nós quaisquer -> quadrilátero
+        Forma pentagono = FabricaFormas.criar(
+                new No(2, 0), new No(4, 1.5), new No(3, 4), new No(1, 4), new No(0, 1.5));      // 5 nós -> pentágono
 
-        // Formas novas - 3 maneiras de as criar:
-        Octogono octogono = new Octogono(0, 0, 1);                                        // 1) classe própria
-        Poligono hexagono = Poligono.regular("Hexágono", 6, 0, 0, 1);                     // 2) polígono regular
-        Poligono formaL = new Poligono("Forma em L", 0, 0, 2, 0, 2, 1, 1, 1, 1, 2, 0, 2); // 3) vértices à mão
+        // Também se podem criar formas com classes próprias (ver Octogono)
+        Forma octogono = new Octogono(0, 0, 1);
 
-        // Lista ligada de formas: só aceita objetos Forma
+        // Lista ligada de formas
         ListaFormas lista = new ListaFormas();
+        lista.adicionar(circulo);
+        lista.adicionar(reta);
         lista.adicionar(triangulo);
         lista.adicionar(retangulo);
-        lista.adicionar(circulo);
+        lista.adicionar(quadrilatero);
+        lista.adicionar(pentagono);
         lista.adicionar(octogono);
-        lista.adicionar(hexagono);
-        lista.adicionar(formaL);
 
         System.out.println("--- Lista (início -> fim) ---");
         lista.listarInicioFim();
@@ -48,12 +55,19 @@ public class Main {
             mostrarNos(f);
         } while (lista.avancar());
 
+        // Reta: percorrer os 2 nós (as pontas têm null)
+        System.out.println("\nA percorrer a reta:");
+        System.out.println("  atual=" + texto(reta.getAtual()) + " | anterior=" + texto(reta.getAnterior())
+                + " | próximo=" + texto(reta.getProximo()));
+        reta.avancar();
+        System.out.println("  atual=" + texto(reta.getAtual()) + " | anterior=" + texto(reta.getAnterior())
+                + " | próximo=" + texto(reta.getProximo()));
+
         // Formas inválidas são rejeitadas
-        try {
-            new Poligono("Linha", 0, 0, 1, 1);
-        } catch (IllegalArgumentException e) {
-            System.out.println("\nForma rejeitada: " + e.getMessage());
-        }
+        System.out.println();
+        tentar("1 nó sem raio", () -> FabricaFormas.criar(new No(0, 0)));
+        tentar("3 nós em linha reta", () -> FabricaFormas.criar(new No(0, 0), new No(1, 1), new No(2, 2)));
+        tentar("nós já usados noutra forma", () -> FabricaFormas.criar(triangulo.getAtual(), triangulo.getProximo()));
 
         // Percorrer o retângulo: dá a volta pelos 4 nós e volta ao início
         System.out.println("\nA percorrer o retângulo:");
@@ -79,6 +93,15 @@ public class Main {
         lista.remover(circulo);
         System.out.println("\n--- Depois de remover o círculo (" + lista.getTamanho() + " formas) ---");
         lista.listarInicioFim();
+    }
+
+    private static void tentar(String descricao, Supplier<Forma> criacao) {
+        try {
+            Forma f = criacao.get();
+            System.out.println("Criada (" + descricao + "): " + f);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Forma rejeitada (" + descricao + "): " + e.getMessage());
+        }
     }
 
     private static void mostrarNos(Forma f) {

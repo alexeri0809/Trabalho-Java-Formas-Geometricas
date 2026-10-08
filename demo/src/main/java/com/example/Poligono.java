@@ -1,14 +1,15 @@
 package com.example;
 
 /**
- * Forma feita de vértices (nós) ligados em loop: o último nó liga ao primeiro.
- * Qualquer polígono (octógono, pentágono, forma em L, ...) pode ser criado
- * diretamente com "new Poligono(nome, x1, y1, x2, y2, ...)", com Poligono.regular(...)
+ * Forma de 3 ou mais nós ligados em loop: o último nó liga ao primeiro.
+ *
+ * Pode ser criada a partir de nós (new Poligono(nome, no1, no2, no3, ...)), de
+ * coordenadas (new Poligono(nome, x1, y1, x2, y2, ...)), com Poligono.regular(...)
  * ou criando uma classe que estenda Poligono (ver Octogono).
  *
- * Só são aceites polígonos válidos: pelo menos 3 vértices, área maior que zero
- * e linhas que não se cruzam. Se algum nó for desligado depois, o loop deixa de
- * estar fechado: o polígono fica incompleto e a área e o perímetro passam a 0.
+ * Só são aceites polígonos válidos: pelo menos 3 nós, área maior que zero e linhas
+ * que não se cruzam. Se algum nó for desligado depois, o loop deixa de estar
+ * fechado: o polígono fica incompleto e a área e o perímetro passam a 0.
  */
 public class Poligono extends Forma {
     private final No primeiro;
@@ -19,6 +20,13 @@ public class Poligono extends Forma {
         super(nome, criarAnel(validar(coordenadas)));
         this.primeiro = getAtual();
         this.numVertices = coordenadas.length / 2;
+    }
+
+    /** Liga os nós indicados em loop, pela ordem em que são dados. Os nós têm de estar livres. */
+    public Poligono(String nome, No... nos) {
+        super(nome, ligarNos(nome, nos));
+        this.primeiro = getAtual();
+        this.numVertices = nos.length;
     }
 
     /** Polígono regular (todos os lados iguais) com "lados" vértices à volta do centro (cx, cy). */
@@ -39,6 +47,48 @@ public class Poligono extends Forma {
             double angulo = 2 * Math.PI * i / lados;
             c[2 * i] = cx + raio * Math.cos(angulo);
             c[2 * i + 1] = cy + raio * Math.sin(angulo);
+        }
+        return c;
+    }
+
+    // ---------- validação e criação do loop de nós ----------
+
+    private static No ligarNos(String nome, No[] nos) {
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("A forma tem de ter um nome");
+        }
+        validarNos(nos);
+        validar(coordenadasDe(nos));
+        for (int i = 0; i < nos.length; i++) {
+            nos[i].ligarProximo(nos[(i + 1) % nos.length]);
+        }
+        return nos[0];
+    }
+
+    private static void validarNos(No[] nos) {
+        if (nos == null || nos.length < 3) {
+            throw new IllegalArgumentException("Um polígono precisa de pelo menos 3 nós");
+        }
+        for (int i = 0; i < nos.length; i++) {
+            if (nos[i] == null) {
+                throw new IllegalArgumentException("Os nós não podem ser null");
+            }
+            if (nos[i].getProximo() != null || nos[i].getAnterior() != null) {
+                throw new IllegalArgumentException("Os nós já estão ligados a outras linhas");
+            }
+            for (int j = i + 1; j < nos.length; j++) {
+                if (nos[i] == nos[j]) {
+                    throw new IllegalArgumentException("O mesmo nó foi usado mais do que uma vez");
+                }
+            }
+        }
+    }
+
+    private static double[] coordenadasDe(No[] nos) {
+        double[] c = new double[nos.length * 2];
+        for (int i = 0; i < nos.length; i++) {
+            c[2 * i] = nos[i].getX();
+            c[2 * i + 1] = nos[i].getY();
         }
         return c;
     }
@@ -105,6 +155,8 @@ public class Poligono extends Forma {
         anterior.ligarProximo(primeiro); // fecha o loop
         return primeiro;
     }
+
+    // ---------- comportamento ----------
 
     /** true se, a partir do primeiro nó, se dá uma volta completa pelos vértices e se volta ao início. */
     public boolean estaFechado() {
